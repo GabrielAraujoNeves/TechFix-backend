@@ -13,6 +13,9 @@ target/
 .springBeans
 .sts4-cache
 
+docker-compose.yml
+.dockerignore
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
