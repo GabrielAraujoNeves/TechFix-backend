@@ -35,4 +35,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // NOVO: Buscar produtos com estoque acima de um valor
     List<Product> findByQuantidadeEstoqueGreaterThan(Integer quantidade);
+
+    // Buscar o produto mais recente (último cadastrado)
+    Optional<Product> findTopByOrderByCreatedAtDesc();
+
+    // Buscar o produto mais recentemente atualizado
+    Optional<Product> findTopByOrderByUpdatedAtDesc();
 }

@@ -187,4 +187,19 @@ public class ProductService {
                 product.getUpdatedAt()
         );
     }
+
+    // Buscar último produto cadastrado
+    public ProductResponse getLastCreatedProduct() {
+        Product product = productRepository.findTopByOrderByCreatedAtDesc()
+                .orElseThrow(() -> new RuntimeException("Nenhum produto encontrado"));
+        return convertToResponse(product);
+    }
+
+
+    // Buscar último produto atualizado
+    public ProductResponse getLastUpdatedProduct() {
+        Product product = productRepository.findTopByOrderByUpdatedAtDesc()
+                .orElseThrow(() -> new RuntimeException("Nenhum produto encontrado"));
+        return convertToResponse(product);
+    }
 }

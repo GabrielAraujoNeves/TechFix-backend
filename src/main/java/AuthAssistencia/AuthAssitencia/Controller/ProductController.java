@@ -196,4 +196,37 @@ public class ProductController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
+
+
+    // Último produto cadastrado
+    @GetMapping("/last-created")
+    public ResponseEntity<?> getLastCreatedProduct() {
+        try {
+            ProductResponse product = productService.getLastCreatedProduct();
+            return ResponseEntity.ok(Map.of(
+                    "message", "Último produto cadastrado",
+                    "product", product,
+                    "cadastradoEm", product.getCreatedAt()
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // Último produto atualizado
+    @GetMapping("/last-updated")
+    public ResponseEntity<?> getLastUpdatedProduct() {
+        try {
+            ProductResponse product = productService.getLastUpdatedProduct();
+            return ResponseEntity.ok(Map.of(
+                    "message", "Último produto atualizado",
+                    "product", product,
+                    "atualizadoEm", product.getUpdatedAt()
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
 }
