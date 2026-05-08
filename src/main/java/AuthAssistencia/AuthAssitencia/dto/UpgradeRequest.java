@@ -11,4 +11,5 @@ public class UpgradeRequest {
     @NotNull private PlanType newPlan;
     @NotNull private PaymentPeriod period;
     @NotNull private PaymentMethod paymentMethod;
+    private CardInfo cardInfo;   // novo campo
 }

@@ -58,6 +58,17 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/company")
+    public ResponseEntity<?> getCompanyDetails() {
+        try {
+            CompanyDetailsResponse response = authService.getCompanyFromAuthenticatedUser();
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
     @GetMapping("/test")
     public ResponseEntity<?> testEndpoint() {
         return ResponseEntity.ok("API is working!");

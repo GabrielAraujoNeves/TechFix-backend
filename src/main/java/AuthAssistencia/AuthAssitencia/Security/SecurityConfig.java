@@ -90,6 +90,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/os/update-status/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/os/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/products/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/company/payment-info").permitAll()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())

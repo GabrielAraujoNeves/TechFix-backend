@@ -4,6 +4,7 @@ import AuthAssistencia.AuthAssitencia.Model.User;
 import AuthAssistencia.AuthAssitencia.Repository.UserRespository;
 import AuthAssistencia.AuthAssitencia.Service.CompanyUserService;
 import AuthAssistencia.AuthAssitencia.dto.CreateUserRequest;
+import AuthAssistencia.AuthAssitencia.dto.PaymentInfoResponse;
 import AuthAssistencia.AuthAssitencia.dto.UserResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ public class CompanyUserController {
 
     @Autowired
     private UserRespository userRepository;
+
 
     // Adicionar novo usuário (funcionário)
     @PostMapping
@@ -87,6 +89,18 @@ public class CompanyUserController {
             return ResponseEntity.ok(Map.of("message", "Usuário promovido a ADMIN", "user", response));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/payment-info")
+    public ResponseEntity<?> getPaymentInfo() {
+        try {
+            PaymentInfoResponse response = companyUserService.getPaymentInfo();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace(); // Isso vai mostrar o erro REAL no console
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 }

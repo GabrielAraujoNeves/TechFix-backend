@@ -34,6 +34,9 @@ public class AuthService {
     private JwtUtil jwtUtil;
 
     @Autowired
+    private CardService cardService;
+
+    @Autowired
     private AuthenticationManager authenticationManager;
 
     @Transactional
@@ -97,6 +100,11 @@ public class AuthService {
         company.setSubscription(subscription);
         companyRepository.save(company);
 
+        if ((request.getPaymentMethod() == PaymentMethod.CREDIT_CARD || request.getPaymentMethod() == PaymentMethod.DEBIT_CARD)
+                && request.getCardInfo() != null) {
+            cardService.saveCard(company.getId(), request.getCardInfo());
+        }
+
         return new RegisterResponse(
                 "User and company registered. Subscription created, pending payment.",
                 true,
@@ -144,5 +152,30 @@ public class AuthService {
     public boolean isAdmin(String email) {
         User user = userRepository.findByEmail(email).orElse(null);
         return user != null && user.getRole() == Role.ADMIN;
+    }
+
+    public CompanyDetailsResponse getCompanyFromAuthenticatedUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        Company company = user.getCompany();
+        if (company == null) {
+            throw new RuntimeException("Empresa não associada ao usuário");
+        }
+        return new CompanyDetailsResponse(
+                company.getId(),
+                company.getNomeEmpresa(),
+                company.getCnpj(),
+                company.getEndereco(),
+                company.getCidade(),
+                company.getEstado(),
+                company.getTelefoneComercial(),
+                company.getSegmentoAtuacao(),
+                company.getSegmentoCode(),
+                company.getEdificacaoId(),
+                company.getOwnerId(),
+                company.getCreatedAt(),
+                company.getUpdatedAt()
+        );
     }
 }

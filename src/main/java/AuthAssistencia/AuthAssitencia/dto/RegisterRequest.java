@@ -36,4 +36,6 @@ public class RegisterRequest {
     @NotNull private PlanType planType;
     @NotNull private PaymentPeriod paymentPeriod;
     @NotNull private PaymentMethod paymentMethod;
+
+    private CardInfo cardInfo;
 }

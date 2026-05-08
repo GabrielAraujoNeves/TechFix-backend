@@ -2,11 +2,15 @@ package AuthAssistencia.AuthAssitencia.Service;
 
 import AuthAssistencia.AuthAssitencia.Model.*;
 import AuthAssistencia.AuthAssitencia.Repository.CompanyRepository;
+import AuthAssistencia.AuthAssitencia.Repository.PaymentCardRepository;
 import AuthAssistencia.AuthAssitencia.Repository.SubscriptionRepository;
 import AuthAssistencia.AuthAssitencia.Repository.UserRespository;
 import AuthAssistencia.AuthAssitencia.dto.CreateUserRequest;
+import AuthAssistencia.AuthAssitencia.dto.PaymentInfoResponse;
 import AuthAssistencia.AuthAssitencia.dto.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +29,9 @@ public class CompanyUserService {
 
     @Autowired
     private SubscriptionRepository subscriptionRepository;
+
+    @Autowired
+    private PaymentCardRepository paymentCardRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -151,5 +158,41 @@ public class CompanyUserService {
                 user.getCreatedAt(),
                 user.getUpdatedAt()
         );
+    }
+
+    private Company getCurrentUserCompany() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = userDetails.getUsername();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Company company = user.getCompany();
+        if (company == null) throw new RuntimeException("Company not found");
+        return company;
+    }
+
+    public PaymentInfoResponse getPaymentInfo() {
+        Company company = getCurrentUserCompany();
+        Subscription subscription = subscriptionRepository.findByCompany(company)
+                .orElseThrow(() -> new RuntimeException("No subscription found"));
+
+        PaymentMethod method = subscription.getPaymentMethod();
+        PaymentInfoResponse response = new PaymentInfoResponse();
+        response.setPaymentMethod(method);
+
+        if (method == PaymentMethod.CREDIT_CARD || method == PaymentMethod.DEBIT_CARD) {
+            PaymentCard card = paymentCardRepository.findByCompanyId(company.getId()).orElse(null);
+            if (card != null) {
+                PaymentInfoResponse.CardDetails details = new PaymentInfoResponse.CardDetails(
+                        card.getLast4(),
+                        card.getBrand(),
+                        card.getExpiryMonth(),
+                        card.getExpiryYear(),
+                        card.getCardholderName(),
+                        card.getCardToken()
+                );
+                response.setCardDetails(details);
+            }
+        }
+        return response;
     }
 }
