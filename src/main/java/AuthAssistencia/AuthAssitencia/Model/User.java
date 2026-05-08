@@ -10,14 +10,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;  // ← Importação correta do java.util.List
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-public class User implements UserDetails {  // ← Adicione implements UserDetails
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,7 +41,12 @@ public class User implements UserDetails {  // ← Adicione implements UserDetai
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @PrePersist  // ← Corrigir: era @PreUpdate
+    // Relacionamento ManyToOne com Company (muitos usuários podem pertencer a uma empresa)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    private Company company;
+
+    @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();

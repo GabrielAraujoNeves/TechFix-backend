@@ -16,7 +16,6 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    // Registro - retorna apenas mensagem de sucesso
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest request) {
         try {
@@ -28,7 +27,6 @@ public class AuthController {
         }
     }
 
-    // Login - retorna token + mensagem
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest request) {
         try {
@@ -40,7 +38,6 @@ public class AuthController {
         }
     }
 
-    // Verificar se token é válido
     @GetMapping("/verify")
     public ResponseEntity<?> verifyToken(@RequestHeader("Authorization") String authorizationHeader) {
         try {
@@ -48,42 +45,28 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(new VerifyResponse(false, null, null, "No token provided"));
             }
-
             String token = authorizationHeader.substring(7);
             VerifyResponse response = authService.verifyToken(token);
-
             if (response.isValid()) {
                 return ResponseEntity.ok(response);
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
-
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new VerifyResponse(false, null, null, "Invalid token"));
         }
     }
 
-    // Endpoint de teste
     @GetMapping("/test")
     public ResponseEntity<?> testEndpoint() {
         return ResponseEntity.ok("API is working!");
     }
 
-    // Classe para erros
     static class ErrorResponse {
         private String error;
-
-        public ErrorResponse(String error) {
-            this.error = error;
-        }
-
-        public String getError() {
-            return error;
-        }
-
-        public void setError(String error) {
-            this.error = error;
-        }
+        public ErrorResponse(String error) { this.error = error; }
+        public String getError() { return error; }
+        public void setError(String error) { this.error = error; }
     }
 }
